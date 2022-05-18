@@ -1,0 +1,20 @@
+models:
+  lstm: /home/tuugu/Documents/Time-Series/model_paths/LSTMModel(_  (lstm)_ LSTM(8, 64, num_layers=3, batch_first=True, dropout=0.2)_  (fc)_ Linear(in_features=64, out_features=1, bias=True)_)_2022-05-18 00_58_14
+  gru: /home/tuugu/Documents/Time-Series/model_paths/GRUModel(_  (gru)_ GRU(8, 64, num_layers=3, batch_first=True, dropout=0.2)_  (fc)_ Linear(in_features=64, out_features=1, bias=True)_)_2022-05-18 02_13_13
+  rnn: /home/tuugu/Documents/Time-Series/model_paths/RNNModel(_  (rnn)_ RNN(8, 64, num_layers=3, batch_first=True, dropout=0.2)_  (fc)_ Linear(in_features=64, out_features=1, bias=True)_)_2022-05-18 02_07_44
+
+model_params:
+  input_dim: 8
+  hidden_dim: 64
+  layer_dim: 3
+  output_dim: 1
+  dropout_prob: 0.2
+
+train_params:
+  n_epochs: 100
+  learning_rate: 1e-3
+  weight_decay: 1e-6
+  batch_size: 64
+
+data: /home/tuugu/Documents/Time-Series/datas/df1.csv
+target_col: Power
