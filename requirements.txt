@@ -1,8 +1,4 @@
 pandas==1.4.2
 scikit-learn==1.0.2
-streamlit
 torch==1.10.0
-torchaudio
-torchlibrosa
-torchsummary
-torchvision
+
