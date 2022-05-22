@@ -16,5 +16,5 @@ train_params:
   weight_decay: 1e-6
   batch_size: 64
 
-data: /home/tuugu/Documents/Time-Series/datas/df1.csv
+data: /home/tuugu/Documents/Time-Series/datas/df.csv
 target_col: Power

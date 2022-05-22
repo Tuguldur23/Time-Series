@@ -11,9 +11,17 @@ def feature_label_split(df, target_col):
 
 def get_data(year, month, day, df):
     indexs = []
-    if len(day) == 1:
+    if len(day) == 1 and len(str(month)) == 1:
+        for index, column in df.iterrows():
+            if column['Datetime'][:10] == f'{year}-0{month}-0{day}':
+                indexs.append(index)
+    elif len(day) == 1 and len(str(month)) == 2:
         for index, column in df.iterrows():
             if column['Datetime'][:10] == f'{year}-{month}-0{day}':
+                indexs.append(index)
+    elif len(day) == 2 and len(str(month)) == 1:
+        for index, column in df.iterrows():
+            if column['Datetime'][:10] == f'{year}-0{month}-{day}':
                 indexs.append(index)
     else:
         for index, column in df.iterrows():
@@ -32,10 +40,3 @@ def data_loader(X, y):
     test = TensorDataset(test_features, test_targets)
     test_loader_one = DataLoader(test, batch_size=1, shuffle=False, drop_last=True)
     return test_loader_one
-
-
-# def loader(df, year, month, day, target_col):
-#     df = get_data(year, month, day, df)
-#     X, y = feature_label_split(df, target_col)
-#     test_loader_one = data_loader(X, y)
-#     return test_loader_one

@@ -1,7 +1,8 @@
 import torch
-from models.LSTM import LSTMModel
-from models.RNN import RNNModel
-from models.GRU import GRUModel
+from LSTM import LSTMModel
+from RNN import RNNModel
+from GRU import GRUModel
+
 
 def build_model(model_name, config):
     if model_name == 'lstm':

@@ -11,7 +11,6 @@ def calculate_metrics(df):
 
 def inverse_transform(scaler, df, columns):
     for col in columns:
-        print(scaler.fit(df[col]))
         df[col] = scaler.inverse_transform(df[col])
     return df
 
