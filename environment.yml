@@ -1,0 +1,21 @@
+name: Time-Series
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python~=3.8
+  - pytorch=1.10.0
+  - cudatoolkit=10.1
+  - fairseq=0.10.2
+  - pyyaml
+  - pip
+  - pandas
+  - matplotlib
+  - rpyc
+  - transformers
+  - sentencepiece
+  - tensorboardX
+  - pip
+  - pip:
+      - torch~=1.10.0
