@@ -1,8 +1,7 @@
-pandas
-scikit-learn
-matplotlib
+pandas==1.4.2
+scikit-learn==1.0.2
 streamlit
-torch
+torch==1.10.0
 torchaudio
 torchlibrosa
 torchsummary
