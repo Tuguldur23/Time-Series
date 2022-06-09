@@ -9,9 +9,11 @@ import streamlit as st
 from data import format_predictions, calculate_metrics
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
+from plotly import graph_objs as go
 
 st.title("Таамаглал")
-
+yes = ['Test', 'Predict']
+hey = st.selectbox('Сонголт', yes)
 years = [2017, 2018, 2019, 2020, 2021, 2022]
 year = st.selectbox("Жилээ сонгох", years)
 
@@ -35,10 +37,9 @@ config = yaml.safe_load(open("/home/tuugu/Documents/Time-Series/configs/config.y
 if ok:
     st.title('Loading...')
     scaler = MinMaxScaler()
-    df = pd.read_csv(config['data'], parse_dates=True, sep=',')
-    df = df[['Datetime', 'Year', 'Month', 'Hour', 'Temperature', 'Prev_day', 'Prev_15min', 'Prev_hour', 'Relative Humidity', 'Power']]
-    df = get_data(year, month, day, df)
+    df = pd.read_csv(config['data'], parse_dates=True, sep=',', index_col=['Datetime'])
     df = df[['Year', 'Month', 'Hour', 'Temperature', 'Prev_day', 'Prev_15min', 'Prev_hour', 'Relative Humidity', 'Power']]
+    df = get_data(year, month, day, df)
     X, y = feature_label_split(df, config['target_col'])
     X_test_arr = scaler.fit_transform(X)
     y_test_arr = scaler.fit_transform(y)
@@ -53,18 +54,66 @@ if ok:
     st.title('Done!')
     value = df_result["value"].to_list()
     pred = df_result["prediction"].to_list()
-    plt.rcParams["figure.autolayout"] = True
-    plt.plot(value, label="Бодит утга")
-    plt.plot(pred, label="Таамагласан утга")
-    plt.legend(loc="upper right", prop={"size":15})
-    plt.xticks([0, 35, 66, 95], [f"{year}-{month}-{day}-0:00", f"{year}-{month}-{day}-8:30", f"{year}-{month}-{day}-16:30", f"{year}-{month}-{day}-23:45"])
-    result_metrics = calculate_metrics(df_result)
-    st.title("Таамагласан өдрийн хүснэгтэн үр дүн")
-    st.dataframe(data=df_result)
-    st.title("Үр дүнгийн утгууд")
-    st.write(result_metrics)
-    st.title("Таамагласан өдрийн зурган үр дүн")
-    st.pyplot(fig=plt)
+    if hey == 'Test':
+        plt.rcParams["figure.autolayout"] = True
+        plt.plot(value, label="Бодит утга")
+        plt.plot(pred, label="Таамагласан утга")
+        plt.legend(loc="upper right", prop={"size":15})
+        plt.xticks([0, 35, 66, 95], [f"{year}-{month}-{day}-0:00", f"{year}-{month}-{day}-8:30", f"{year}-{month}-{day}-16:30", f"{year}-{month}-{day}-23:45"])
+        result_metrics = calculate_metrics(df_result)
+        pred_max = df_result['prediction'].sum()
+        value_max = df_result['value'].sum()
+        st.title("Таамагласан өдрийн хүснэгтэн үр дүн")
+        st.write(f"Тухайн өдрийн таамагласан нийт чадал {pred_max} Ватт")
+        st.write(f"Тухайн өдрийн нийт чадал {value_max} Ватт")
+        st.write(f"Тухайн өдрийн таамагласан хамгийн их чадал {df_result['prediction'].max()} Ватт")
+        st.write(f"Тухайн өдрийн хамгийн их чадал {df_result['value'].max()} Ватт")
+        st.write(f"Таамагласан ${(pred_max/1000)*0.12} доллар")
+        st.write(f"Таамагласан {((pred_max/1000)*0.12)*3120} төгрөг")
+        st.write(f"Бодит ${(value_max / 1000)*0.12} доллар")
+        st.write(f"Бодит {((value_max/1000)*0.12)*3120} төгрөг")
+        st.dataframe(data=df_result)
+        st.download_button('Татах CSV', df_result.to_csv(), file_name=f"{year}{month}{day}.csv")
+        st.title("Үр дүнгийн утгууд")
+        st.write(result_metrics)
+        st.title("Таамагласан өдрийн зурган үр дүн")
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=df_result.index, y=df_result['prediction'], name='Таамаглал'))
+        fig.add_trace(go.Scatter(x=df_result.index, y=df_result['value'], name='Бодит утга'))
+        fig.layout.update(xaxis_title="Хугацаа", yaxis_title="Чадал", xaxis_rangeslider_visible=True, font=dict(
+        family="Courier New, monospace",
+        size=18,
+        color="RebeccaPurple"))
+        st.plotly_chart(fig)
+    else:
+        plt.rcParams["figure.autolayout"] = True
+        plt.plot(pred, label="Таамагласан утга")
+        plt.legend(loc="upper right", prop={"size":15})
+        plt.xticks([0, 35, 66, 95], [f"{year}-{month}-{day}-0:00", f"{year}-{month}-{day}-8:30", f"{year}-{month}-{day}-16:30", f"{year}-{month}-{day}-23:45"])
+        result_metrics = calculate_metrics(df_result)
+        pred_max = df_result['prediction'].sum()
+        st.title("Таамагласан өдрийн үр дүн")
+        st.write(f"Тухайн өдрийн таамагласан нийт чадал {pred_max} Ватт")
+        st.write(f"Тухайн өдрийн таамагласан хамгийн их чадал {df_result['prediction'].max()} Ватт")
+        st.write(f"Таамагласан ${(pred_max/1000)*0.12} доллар")
+        st.write(f"Таамагласан {((pred_max/1000)*0.12)*3120} төгрөг")
+        st.dataframe(data=df_result['prediction'])
+        if len(day) == 1 and len(str(month)) == 1:
+            st.download_button('Татах CSV', df_result['prediction'].to_csv(), file_name=f"{year}0{month}0{day}.csv")
+        elif len(day) == 1 and len(str(month)) == 2:
+            st.download_button('Татах CSV', df_result['prediction'].to_csv(), file_name=f"{year}{month}0{day}.csv")
+        elif len(day) == 2 and len(str(month)) == 1:
+            st.download_button('Татах CSV', df_result['prediction'].to_csv(), file_name=f"{year}0{month}{day}.csv")
+        else:
+            st.download_button('Татах CSV', df_result['prediction'].to_csv(), file_name=f"{year}{month}{day}.csv")
+        st.title("Таамагласан өдрийн зурган үр дүн")
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=df_result.index, y=df_result['prediction'], name='Таамаглал'))
+        fig.layout.update(xaxis_title="Хугацаа", yaxis_title="Чадал", xaxis_rangeslider_visible=True, font=dict(
+        family="Courier New, monospace",
+        size=18,
+        color="RebeccaPurple"))
+        st.plotly_chart(fig)
     if select_model == "lstm":
         st.title("LSTM тест хариу")
         st.dataframe(data=pd.read_csv("/home/tuugu/Documents/Time-Series/datas/uzuuleh.csv"))

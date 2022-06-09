@@ -13,21 +13,21 @@ def get_data(year, month, day, df):
     indexs = []
     if len(day) == 1 and len(str(month)) == 1:
         for index, column in df.iterrows():
-            if column['Datetime'][:10] == f'{year}-0{month}-0{day}':
+            if str(index)[:10] == f'{year}-0{month}-0{day}':
                 indexs.append(index)
     elif len(day) == 1 and len(str(month)) == 2:
         for index, column in df.iterrows():
-            if column['Datetime'][:10] == f'{year}-{month}-0{day}':
+            if str(index)[:10] == f'{year}-{month}-0{day}':
                 indexs.append(index)
     elif len(day) == 2 and len(str(month)) == 1:
         for index, column in df.iterrows():
-            if column['Datetime'][:10] == f'{year}-0{month}-{day}':
+            if str(index)[:10] == f'{year}-0{month}-{day}':
                 indexs.append(index)
     else:
         for index, column in df.iterrows():
-            if column['Datetime'][:10] == f'{year}-{month}-{day}':
+            if f'{year}-{month}-{day}' == str(index)[:10]:
                 indexs.append(index)
-    df = df.iloc[indexs[0]:indexs[-1]+1]
+    df = df.loc[indexs[0]:indexs[-1]]
     return df
 
 
